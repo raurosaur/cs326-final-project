@@ -207,3 +207,38 @@ input[type=checkbox]:checked + label{
   text-decoration: line-through;
   opacity: 30%;
 }
+
+/*Responsive*/
+@media screen and (max-width: 480px) {
+  
+  #headers{
+    flex-direction: column;
+  }
+
+  #headers>img{
+    padding-top: 3rem;
+  }
+
+  #search-bar{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+@media screen and (max-width: 850px) {
+    #content{
+      flex-direction: column;
+      height: max-content;
+    }
+    
+    #main-recipe{
+      max-width: none;
+    }
+  
+    #content>div{
+      width: 80% !important;
+      margin: 1rem 0;
+    }
+}
