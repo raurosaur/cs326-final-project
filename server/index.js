@@ -1,7 +1,8 @@
 import express, {response} from "express";
 import logger from "morgan";
-import {uniqid} from uniqid;
 import { MongoClient } from "mongodb";
+import { v4 as uuidv4 } from 'uuid';
+import path from "path";
 
 // TODO #2: Create an Express app.
 const app = express();
@@ -11,26 +12,41 @@ const port = process.env.PORT || 5500;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(logger('dev'));
-app.use('/', express.static('client'));
+app.use("/", express.static('client'));
 
-const username = process.env.username || "";
-const password = process.env.password || "";
+const password = process.env.password || "mohkav-jevmuc-5pokGe";
 
-const url = `mongodb+srv://${username}:${password}@cluster01.mongodb.net/?retryWrites=true&w=majority`;
+const url = `mongodb+srv://raurosaur:${password}@cluster01.2bz1e9m.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(url);
 
+//Delete data after 3 days
+try{
+  await client.connect();
+  const db = client.db("PantryPal");
+  const col = db.collection("shopping-list");
+  col.createIndex({ "createdAt": 1 }, { expireAfterSeconds: 259200 });
+}
+catch(err){
+  console.log(err);
+}
+finally{
+  await client.close();
+}
 
 //save data in uniqid
-app.post('/:uniqid', async (req, res)=>{
+app.post('/list/:uniqid', async (req, res)=>{
   const uniqid = req.params?.uniqid;
   const {list, id} = req.body;
-
+  
   try{
     await client.connect();
     const db = client.db("PantryPal");
     const col = db.collection("shopping-list");
-    await col.insertOne({uniqid,list,id});
+    if (uniqid === "notnew")
+      await col.insertOne({"uniqid": uuidv4(),list,id, "createdAt": new Date()});
+    else
+      await findOneAndUpdate({uniqid}, {"$set":{list, id, "createdAt": new Date()}});
     res.status(200).json({"status": "success"});
   }
   catch(error){
@@ -41,15 +57,19 @@ app.post('/:uniqid', async (req, res)=>{
   }
 });
 
-// Handle requests to the unique URL
-app.get('/:uniqid', async (req, res) => {
+
+//reads data
+app.get('/list/:uniqid', async (req, res) => {
+  console.log('hello');
   const uniqid = req.params?.uniqid;
+  console.log(uniqid);
   try{
     await client.connect();
     const db = client.db("PantryPal");
     const col = db.collection("shopping-list");
-
-    const info = await col.findOne({$uniqid: uniqid});
+    console.log("into collection");
+    const info = await col.findOne({uniqid: uniqid});
+    console.log(info);
     res.status(200).json(info);
   }
   catch(err){
@@ -58,6 +78,12 @@ app.get('/:uniqid', async (req, res) => {
   finally{
     await client.close();
   }
+});
+
+//
+
+app.get('/getNewId', (req, res) => {
+  res.status(200).json({id:uuidv4()});
 });
 
 // This matches all routes that are not defined.

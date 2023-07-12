@@ -5,21 +5,27 @@ const KEY = "17a117cc72203109eacfce3afae1487f";
 const ID  = "d66e5273";
 
 //HTML ELEMENTS
-const search = document.getElementById("search");
-const go = document.getElementById("go");
-const recipes = document.getElementById("recipes-container");
+const search     = document.getElementById("search");
+const code     = document.getElementById("code");
+const go         = document.getElementById("go");
+const recipes    = document.getElementById("recipes-container");
 const mainRecipe = document.getElementById("main-recipe");
 const mainRecipeContainer = document.getElementById("main-recipe-container");
-const closeBttn = document.getElementById("close");
+const closeBttn  = document.getElementById("close");
 const listContainer = document.getElementById("list-container");
 const addToListBttn = document.getElementById("atlb");
+const lookBttn      = document.getElementById("look");
+const saveBttn      = document.getElementById("save");
+const shareBttn     = document.getElementById("share");
 
 const list = new ShoppingList();
+let id = "notnew";
 
 let hits = [];
 let recipe = null;
 
 search.value="";
+code.value="";
 
 async function openRecipe(element){
   const indx = element.target.getAttribute("search-index");
@@ -82,11 +88,27 @@ function addToList(){
 //Event Listeners
 go.addEventListener("click", onPressGo);
 
+lookBttn.addEventListener("click", async () => {
+  const cd = code.value;
+  id = await list.getList(cd, listContainer);
+});
+
+//Save it to local storage
+saveBttn.addEventListener("click", async () => {
+});
+
+//Save it to global
+shareBttn.addEventListener("click", async () => {
+  console.log(id);
+  await list.saveList(id);
+});
+
+
 document.addEventListener("keydown", async (event) => {
   if(event.key === "Enter")
     await onPressGo();
-  if(event.key === "Shift")
-    console.log(list.list);
+  if(event.key === "Shift"){
+  }
 });
 
 addToListBttn.addEventListener("click", addToList);

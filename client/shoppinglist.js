@@ -48,32 +48,43 @@ export class ShoppingList{
   }
 
   async saveList(uniqid){
-    await fetch("/uniqid", {
+    await fetch(`/list/${uniqid}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: {
+      body: JSON.stringify({
+        uniqid,
         "list":this.list,
         "id": this.id
-      }
+      })
     });
   }
 
   async getList(uniqid, element){
-    const response = await fetch("/uniqid", {
+    const response = await fetch(`list/${uniqid}`, {
       method:"GET",
     });
 
     if(!response.ok){
-      //SOMETHING ERROR
-      return;
+      alert("Error 404");
+      return "notnew";
     }
     
-    const {list, id} = await response.json();
+    console.log(response);
+
+    const js = await response.json();
+    
+    console.log(js);
+
+    if(js === null){
+      alert("Not found! Has it been longer than 3 days?");
+      return "notnew";
+    }
+    const {list, id} = js;
     this.list = list;
     this.id = id;
-
     this.render(element);
+    return uniqid;
   }
 }
