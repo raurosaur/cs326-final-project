@@ -47,11 +47,33 @@ export class ShoppingList{
     });
   }
 
-  async saveList(){
-
+  async saveList(uniqid){
+    await fetch("/uniqid", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "list":this.list,
+        "id": this.id
+      })
+    });
   }
 
-  async getList(id){
+  async getList(uniqid, element){
+    const response = await fetch("/uniqid", {
+      method:"GET",
+    });
 
+    if(!response.ok){
+      //SOMETHING ERROR
+      return;
+    }
+    
+    const {list, id} = await response.json();
+    this.list = list;
+    this.id = id;
+
+    this.render(element);
   }
 }

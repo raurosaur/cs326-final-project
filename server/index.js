@@ -1,5 +1,6 @@
 import express, {response} from "express";
 import logger from "morgan";
+import {uniqid} from uniqid;
 
 // TODO #2: Create an Express app.
 const app = express();
@@ -10,6 +11,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(logger('dev'));
 app.use('/', express.static('client'));
+
+//Create unique id
+const uniqid = new uniqid();
+
+//save data in uniqid
+app.post('/:uniqid', (req, res)=>{
+
+});
+
+// Handle requests to the unique URL
+app.get('/:uniqid', (req, res) => {
+  const uniqid = req.params.uniqid;
+});
 
 // This matches all routes that are not defined.
 app.all('*', async (request, response) => {
