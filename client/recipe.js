@@ -65,7 +65,7 @@ export class Recipe{
       </div>
       <div id = "allergens"><strong>Allergens:</strong> ${this.allergens.join(" | ")}</div>
       <div id = "calories"><strong>Calories:</strong> ${Math.round(this.calories)} kcal</div>
-      <a href="${this.url}" id="url"a> Full Recipe! </a>
+      <a href="${this.url}" id="url" target="_blank" rel="noopener noreferrer"> Full Recipe! </a>
     `;
 
     element.innerHTML = html;

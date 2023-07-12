@@ -6,11 +6,15 @@
 *{
   margin: 0;
   padding: 0;
+  font-family: kalam, sans-serif;
 }
 
 body{
   background-color: #0a8f7b;
+}
 
+a{
+  color: #9543de;
 }
 
 h1{
@@ -23,7 +27,7 @@ h1{
 
 #headers{
   display: flex;
-  justify-content: start;
+  justify-content: space-around;
   align-items:center;
   padding: 0 10vw;
 }
@@ -81,19 +85,15 @@ h1{
   padding: 20px;
 }
 
-.headings{
-  font-family: kalam, sans-serif;
-}
-
 #recipes{
   display: flex;
   width: 30% !important;
   flex-direction: column;
   overflow: scroll;
+  border-radius: 10px;
 }
 
 .small-recipe{
-  font-family: kalam;
   padding: 10px;
 }
 
@@ -112,6 +112,7 @@ h1{
   justify-content: center;
   align-items: center;
   max-width: 30%;
+  border-radius: 10px;
 }
 
 #main-recipe>.headings{
@@ -156,7 +157,7 @@ h1{
 }
 
 #main-recipe>input{
-  background-color: #e07d7d;
+  background-color: #d84646;
   height: 40%;
   grid-area: 3/2;
   padding: 0 10px;
@@ -178,12 +179,12 @@ h1{
   padding: 0px 20px;
   font-size: 30px;
   cursor: pointer;
-
+  font-family: sans-serif;
 }
 
 #shopping-list{
   width: 30% !important;
-  font-family: kalam, sans-serif;
+  border-radius: 10px;
 }
 
 #list-container{
