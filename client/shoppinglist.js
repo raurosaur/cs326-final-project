@@ -15,10 +15,10 @@ export class ShoppingList{
     });
   }
 
-  _renderListElement(id, item){
+  _renderListElement(id, item, checked){
     return `
     <div>
-      <input type="checkbox" name="list${id}" id = "list${id}">
+      <input type="checkbox" name="list${id}" id = "list${id}" ${checked?"checked":""}>
       <label for="list${id}" id="label-list${id}">${item}</label>
       <span id="span-${id}">🗑</span>
     </div>
@@ -30,6 +30,7 @@ export class ShoppingList{
     divElem.addEventListener("click", () => {
       this.list.splice(this.list.findIndex(x => x.id === id), 1);
       element.removeChild(divElem.parentNode);  
+      this.saveToLocalStorage();
     });
     document.getElementById(`list${id}`).addEventListener("click", (e) => {
       const lE = this.list.find(x => x.id === id);
@@ -40,7 +41,7 @@ export class ShoppingList{
   render(element){
     element.innerHTML = 
       this.list
-        .map(x => this._renderListElement(x.id, x.item))
+        .map(x => this._renderListElement(x.id, x.item, x["checked"]))
         .join("");
     this.list.forEach(listEl => {
       this._addListener(listEl.id, element);
@@ -48,7 +49,7 @@ export class ShoppingList{
   }
 
   async saveList(uniqid){
-    await fetch(`/list/${uniqid}`, {
+    const res = await fetch(`/list/${uniqid}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -59,6 +60,12 @@ export class ShoppingList{
         "id": this.id
       })
     });
+    if(!res.ok){
+      alert("Invalid ID");
+      return "notnew";
+    }
+    const js = await res.json();
+    return ("id" in js) ? js.id : "notnew";
   }
 
   async getList(uniqid, element){
@@ -71,11 +78,7 @@ export class ShoppingList{
       return "notnew";
     }
     
-    console.log(response);
-
     const js = await response.json();
-    
-    console.log(js);
 
     if(js === null){
       alert("Not found! Has it been longer than 3 days?");
@@ -86,5 +89,14 @@ export class ShoppingList{
     this.id = id;
     this.render(element);
     return uniqid;
+  }
+
+  saveToLocalStorage(){
+    window.localStorage.setItem("list", JSON.stringify({list: this.list, id: this.id}));
+  }
+
+  reset(){
+    this.list = [];
+    this.id = 0;
   }
 }

@@ -34,10 +34,12 @@ h1{
   padding: 0;
 }
 
-#search-bar{
+#search-bar>div{
   margin-left: auto;
 }
-
+#search-bar>input{
+  margin-top: 0.3rem;
+}
 #search,#code{
   width: 300px;
   border-radius: 10px;
@@ -54,7 +56,7 @@ h1{
   border: none;
 }
 
-#go:hover,#look{
+#go:hover,#look:hover{
   background-color: #3a165a;
 }
 
@@ -175,6 +177,8 @@ h1{
   align-self: start;
   padding: 0px 20px;
   font-size: 30px;
+  cursor: pointer;
+
 }
 
 #shopping-list{
@@ -237,6 +241,11 @@ input[type=checkbox]:checked + label{
 }
 #save:hover{
   background-color:rgb(0, 0, 90);
+}
+
+input[type="button"]
+{
+  cursor: pointer;
 }
 
 /*Responsive*/

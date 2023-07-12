@@ -2,7 +2,6 @@ import express, {response} from "express";
 import logger from "morgan";
 import { MongoClient } from "mongodb";
 import { v4 as uuidv4 } from 'uuid';
-import path from "path";
 
 // TODO #2: Create an Express app.
 const app = express();
@@ -20,12 +19,12 @@ const url = `mongodb+srv://raurosaur:${password}@cluster01.2bz1e9m.mongodb.net/?
 
 const client = new MongoClient(url);
 
-//Delete data after 3 days
+// Delete data after 3 days
 try{
   await client.connect();
   const db = client.db("PantryPal");
   const col = db.collection("shopping-list");
-  col.createIndex({ "createdAt": 1 }, { expireAfterSeconds: 259200 });
+  await col.createIndex({ "createdAt": 1 }, { expireAfterSeconds: 30 });
 }
 catch(err){
   console.log(err);
@@ -34,20 +33,22 @@ finally{
   await client.close();
 }
 
-//save data in uniqid
+//create/update data in uniqid
 app.post('/list/:uniqid', async (req, res)=>{
-  const uniqid = req.params?.uniqid;
+  let uniqid = req.params?.uniqid;
   const {list, id} = req.body;
   
   try{
     await client.connect();
     const db = client.db("PantryPal");
     const col = db.collection("shopping-list");
-    if (uniqid === "notnew")
-      await col.insertOne({"uniqid": uuidv4(),list,id, "createdAt": new Date()});
+    if (uniqid === "notnew"){
+      uniqid = uuidv4();
+      await col.insertOne({uniqid,list,id, "createdAt": new Date()});
+    }
     else
-      await findOneAndUpdate({uniqid}, {"$set":{list, id, "createdAt": new Date()}});
-    res.status(200).json({"status": "success"});
+      await col.findOneAndUpdate({uniqid}, {"$set":{list, id, "createdAt": new Date()}});
+    res.status(200).json({"status": "success", "id": uniqid});
   }
   catch(error){
     res.status(404).json({error : "Couldn't insert"});
@@ -60,16 +61,12 @@ app.post('/list/:uniqid', async (req, res)=>{
 
 //reads data
 app.get('/list/:uniqid', async (req, res) => {
-  console.log('hello');
   const uniqid = req.params?.uniqid;
-  console.log(uniqid);
   try{
     await client.connect();
     const db = client.db("PantryPal");
     const col = db.collection("shopping-list");
-    console.log("into collection");
     const info = await col.findOne({uniqid: uniqid});
-    console.log(info);
     res.status(200).json(info);
   }
   catch(err){
@@ -80,7 +77,28 @@ app.get('/list/:uniqid', async (req, res) => {
   }
 });
 
-//
+//delete entry
+app.delete('/delete/:uniqid', async (req, res) => {
+  const uniqid = req.params.uniqid;
+  console.log(uniqid)
+  try{
+    await client.connect();
+    const db = client.db("PantryPal");
+    const col = db.collection("shopping-list");
+    if (uniqid !== "notnew"){
+      console.log(await col.deleteOne({"uniqid":uniqid}));
+      res.status(200).json({"status": "success"});
+    }
+    else
+      res.status(404).json({error: "entry doesn't exist"})
+  }
+  catch(error){
+    res.status(404).json({error : "Couldn't delete"});
+  }
+  finally{
+    await client.close();
+  }
+});
 
 app.get('/getNewId', (req, res) => {
   res.status(200).json({id:uuidv4()});

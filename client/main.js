@@ -17,15 +17,41 @@ const addToListBttn = document.getElementById("atlb");
 const lookBttn      = document.getElementById("look");
 const saveBttn      = document.getElementById("save");
 const shareBttn     = document.getElementById("share");
+const deleteBttn     = document.getElementById("delete");
 
 const list = new ShoppingList();
 let id = "notnew";
 
-let hits = [];
+let hits =  [];
 let recipe = null;
 
-search.value="";
+if(window.localStorage.getItem("hits") !== null)
+  hits = JSON.parse(window.localStorage.getItem("hits"));
+search.value= "";
 code.value="";
+
+//Local Storage
+if(recipe == null  && window.localStorage.getItem("recipe") !== null){
+  recipe = new Recipe(undefined);
+  recipe.retrieve();
+  mainRecipe.style.display = "grid";
+  recipe.render(mainRecipeContainer);
+}
+if(window.localStorage.getItem("list") != null){
+  let temp = JSON.parse(window.localStorage.getItem("list"));
+  list.list = temp.list;
+  list.id = temp.id;
+  list.render(listContainer);
+}
+if(hits.length > 0){
+  let html = ""
+  hits.forEach((hit,i) => {
+    html += `<div class = "small-recipe" search-index=${i}>${hit.recipe.label} - ${hit.recipe.source}</div>`;
+  });
+  recipes.innerHTML = html;
+  addListeners();
+}
+
 
 async function openRecipe(element){
   const indx = element.target.getAttribute("search-index");
@@ -41,6 +67,7 @@ async function openRecipe(element){
   recipe = new Recipe(resBody);
   mainRecipe.style.display = "grid";
   recipe.render(mainRecipeContainer);
+  recipe.saveToLocalStorage();
 }
 
 function addListeners(){
@@ -75,8 +102,8 @@ async function onPressGo(){
     html += `<div style="font-family:kalam, sans-serif"> Search returned no result ☹️. Try Again!</div>`
   recipes.innerHTML = html; 
   addListeners();
+  window.localStorage.setItem("hits", JSON.stringify(hits));
 }
-
 
 function addToList(){
   if(recipe == null)
@@ -88,6 +115,7 @@ function addToList(){
 //Event Listeners
 go.addEventListener("click", onPressGo);
 
+//Load from global storage
 lookBttn.addEventListener("click", async () => {
   const cd = code.value;
   id = await list.getList(cd, listContainer);
@@ -95,14 +123,37 @@ lookBttn.addEventListener("click", async () => {
 
 //Save it to local storage
 saveBttn.addEventListener("click", async () => {
+  list.saveToLocalStorage();
 });
 
 //Save it to global
 shareBttn.addEventListener("click", async () => {
-  console.log(id);
-  await list.saveList(id);
+  id = await list.saveList(id);
+  if(id !== "notnew"){
+    navigator.clipboard.writeText(id);
+    alert(`Copied code to Clipboard!
+       Don't forget to save the code somewhere. 
+       Codes expires in 3 days`);
+  }
 });
 
+//Delete from global
+deleteBttn.addEventListener("click", async () => {
+  if(id === "notnew")
+    return;
+    console.log(id)
+  const res = await fetch(`/delete/${id}`, {"method":"DELETE"});
+
+  if(!res.ok){
+    alert("Unexpected Error");
+    return;
+  }
+
+  alert("Successfully Deleted");
+  list.reset();
+  id = "notnew";
+  list.render(listContainer);
+});
 
 document.addEventListener("keydown", async (event) => {
   if(event.key === "Enter")
@@ -115,4 +166,5 @@ addToListBttn.addEventListener("click", addToList);
 
 closeBttn.addEventListener("click", () => {
   mainRecipe.style.display = "none";
+  window.localStorage.removeItem("recipe");
 });
