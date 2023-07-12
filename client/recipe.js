@@ -18,10 +18,12 @@ export class Recipe{
     }
   }
 
+  //returns shopping list
   shoppingList(){
     return this.ingredients.map(x => `${x.food} --- ${x.quantity} ${x.measure}`);
   }
 
+  //saves recipe to local storage
   saveToLocalStorage(){
     window.localStorage.setItem("recipe", JSON.stringify({
       url : this.url,
@@ -36,6 +38,7 @@ export class Recipe{
     }))
   }
 
+  //retrieves data from local storage
   retrieve(){
     const obj = JSON.parse(window.localStorage.getItem("recipe"));
     if(obj == null)
@@ -50,6 +53,8 @@ export class Recipe{
     this.allergens = obj.allergens;
     this.source = obj.source;
   }
+
+  //renders recipe to html
   render(element){
     let html = "";
 

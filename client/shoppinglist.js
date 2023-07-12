@@ -4,6 +4,7 @@ export class ShoppingList{
     this.id = 0;
   }
 
+  //Adds ingredients from recipe to the list
   addToList(recipe){
     const {label} = recipe;
     recipe.ingredients.forEach(ingredient => {
@@ -15,6 +16,7 @@ export class ShoppingList{
     });
   }
 
+  //Renders individual list item
   _renderListElement(id, item, checked){
     return `
     <div>
@@ -25,6 +27,7 @@ export class ShoppingList{
     `;
   }
 
+  //Dynamically adds listener to individual list item
   _addListener(id, element){
     const divElem = document.getElementById(`span-${id}`);
     divElem.addEventListener("click", () => {
@@ -38,6 +41,7 @@ export class ShoppingList{
     });
   }
 
+  //renders the shopping list
   render(element){
     element.innerHTML = 
       this.list
@@ -48,6 +52,7 @@ export class ShoppingList{
     });
   }
 
+  //sends POST request to server 
   async saveList(uniqid){
     const res = await fetch(`/list/${uniqid}`, {
       method: "POST",
@@ -68,6 +73,7 @@ export class ShoppingList{
     return ("id" in js) ? js.id : "notnew";
   }
 
+  //sends GET request to server
   async getList(uniqid, element){
     const response = await fetch(`list/${uniqid}`, {
       method:"GET",
@@ -91,10 +97,12 @@ export class ShoppingList{
     return uniqid;
   }
 
+  //saves list to localStorage
   saveToLocalStorage(){
     window.localStorage.setItem("list", JSON.stringify({list: this.list, id: this.id}));
   }
 
+  //resets data in the list
   reset(){
     this.list = [];
     this.id = 0;

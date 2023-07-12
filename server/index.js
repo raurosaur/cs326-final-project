@@ -3,11 +3,11 @@ import logger from "morgan";
 import { MongoClient } from "mongodb";
 import { v4 as uuidv4 } from 'uuid';
 
-// TODO #2: Create an Express app.
+// Create an Express app.
 const app = express();
 const port = process.env.PORT || 5500;
 
-// TODO #3: Add middleware to the Express app.
+// Add middleware to the Express app.
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(logger('dev'));
@@ -24,7 +24,7 @@ try{
   await client.connect();
   const db = client.db("PantryPal");
   const col = db.collection("shopping-list");
-  await col.createIndex({ "createdAt": 1 }, { expireAfterSeconds: 30 });
+  await col.createIndex({ "createdAt": 1 }, { expireAfterSeconds: 3 * 24 * 60 * 60 });
 }
 catch(err){
   console.log(err);

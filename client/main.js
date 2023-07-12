@@ -52,7 +52,7 @@ if(hits.length > 0){
   addListeners();
 }
 
-
+//Opens recipe from search
 async function openRecipe(element){
   const indx = element.target.getAttribute("search-index");
   const {uri} = hits[indx].recipe;
@@ -70,12 +70,14 @@ async function openRecipe(element){
   recipe.saveToLocalStorage();
 }
 
+//dynamically adds listener to the elements
 function addListeners(){
   const rec = document.getElementsByClassName("small-recipe");
   for(let i = 0; i < rec.length; i++)
     rec[i].addEventListener("click", openRecipe);
 }
 
+//searches in the external API
 async function onPressGo(){
   const {value} = search;
   const keywords = value.split(" ");
@@ -105,6 +107,7 @@ async function onPressGo(){
   window.localStorage.setItem("hits", JSON.stringify(hits));
 }
 
+//adds ingredients to the list
 function addToList(){
   if(recipe == null)
   return;
@@ -155,6 +158,7 @@ deleteBttn.addEventListener("click", async () => {
   list.render(listContainer);
 });
 
+//Keydown Enter event
 document.addEventListener("keydown", async (event) => {
   if(event.key === "Enter")
     await onPressGo();
@@ -162,8 +166,10 @@ document.addEventListener("keydown", async (event) => {
   }
 });
 
+//Adds to shopping list event listener
 addToListBttn.addEventListener("click", addToList);
 
+//Close button for closing main recipe
 closeBttn.addEventListener("click", () => {
   mainRecipe.style.display = "none";
   window.localStorage.removeItem("recipe");
