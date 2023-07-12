@@ -53,10 +53,10 @@ export class ShoppingList{
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
+      body: {
         "list":this.list,
         "id": this.id
-      })
+      }
     });
   }
 
